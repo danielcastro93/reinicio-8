@@ -1,0 +1,1347 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Reinicio 8" />
+<meta name="theme-color" content="#000000" />
+<link rel="apple-touch-icon" href="icons/icon-180.png" />
+<link rel="icon" type="image/png" href="icons/icon-192.png" />
+<link rel="manifest" href="manifest.webmanifest" />
+<title>Reinicio 8</title>
+<style>
+:root{
+  --bg:#000;
+  --card:#1c1c1e;
+  --card2:#2c2c2e;
+  --card3:#3a3a3c;
+  --sep:rgba(84,84,88,.42);
+  --label:#fff;
+  --label2:rgba(235,235,245,.62);
+  --label3:rgba(235,235,245,.32);
+  --orange:#ff9f0a;
+  --green:#30d158;
+  --red:#ff453a;
+  --blue:#0a84ff;
+  --pink:#fa114f;
+  --cyan:#00d4e6;
+  --teal:#40c8e0;
+  --purple:#bf5af2;
+  --yellow:#ffd60a;
+  --indigo:#5e5ce6;
+  --gutter:20px;
+  --radius:22px;
+  --safe-b:env(safe-area-inset-bottom, 0px);
+  --safe-t:env(safe-area-inset-top, 0px);
+  --ease:cubic-bezier(.32,.72,0,1);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--label);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+body{min-height:100vh;overscroll-behavior-y:none}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none;padding:0}
+svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+svg.i.sm{width:17px;height:17px}
+svg.i.xs{width:14px;height:14px;stroke-width:2.4}
+.app{width:min(100%,640px);margin:0 auto;padding:calc(var(--safe-t) + 18px) var(--gutter) calc(124px + var(--safe-b))}
+
+/* page + header */
+.page{display:none;animation:pageIn .38s var(--ease)}
+.page.active{display:block}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.lt{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:4px 0 6px}
+.lt .date{font-size:13px;font-weight:600;color:var(--label2);margin-bottom:2px}
+h1{font-size:34px;line-height:1.08;font-weight:700;letter-spacing:-.4px;margin:0}
+.lead{font-size:15px;line-height:1.45;color:var(--label2);margin:6px 0 0}
+.avatar{width:38px;height:38px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+  background:linear-gradient(160deg,#636366,#3a3a3c);font-size:16px;font-weight:600;color:#fff}
+
+.section{margin-top:32px}
+.sh{display:flex;align-items:baseline;justify-content:space-between;margin:0 4px 10px}
+.sh h2{font-size:22px;font-weight:700;letter-spacing:-.3px;margin:0}
+.sh .link{color:var(--blue);font-size:15px}
+.foot{font-size:13px;line-height:1.4;color:var(--label2);margin:8px 16px 0}
+
+.card{background:var(--card);border-radius:var(--radius);padding:20px}
+.card + .card{margin-top:12px}
+.stack{display:grid;gap:12px}
+
+/* buttons */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;
+  border-radius:16px;font-size:17px;font-weight:600;letter-spacing:-.2px;transition:transform .15s,opacity .2s,background .2s}
+.btn:active{transform:scale(.98);opacity:.85}
+.btn.primary{background:var(--orange);color:#000}
+.btn.green{background:var(--green);color:#002a0c}
+.btn.tinted{background:rgba(255,159,10,.16);color:var(--orange)}
+.btn.gray{background:var(--card2);color:#fff}
+.btn.plain{min-height:44px;color:var(--blue);font-weight:500}
+.btn[disabled]{opacity:.35;pointer-events:none}
+.btn + .btn{margin-top:10px}
+
+/* rings */
+.rings-card{display:grid;grid-template-columns:132px 1fr;gap:22px;align-items:center}
+.rings{width:132px;height:132px}
+.rings circle{fill:none;stroke-linecap:round}
+.rings .fg{transition:stroke-dashoffset 1s var(--ease)}
+.legend{display:grid;gap:14px}
+.legend .lab{font-size:13px;font-weight:600;color:var(--label2)}
+.legend .val{font-size:22px;font-weight:700;letter-spacing:-.3px;font-variant-numeric:tabular-nums;margin-top:1px}
+.legend .val small{font-size:15px;font-weight:600;color:var(--label2);margin-left:2px}
+.c-pink{color:var(--pink)}.c-green{color:var(--green)}.c-cyan{color:var(--cyan)}.c-orange{color:var(--orange)}
+.c-red{color:var(--red)}.c-blue{color:var(--blue)}.c-muted{color:var(--label2)}
+
+/* today card */
+.kicker{font-size:13px;font-weight:600;color:var(--orange)}
+.big-title{font-size:24px;font-weight:700;letter-spacing:-.3px;margin:4px 0 4px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:14px;color:var(--label2);margin-top:8px}
+.meta span{display:inline-flex;align-items:center;gap:5px}
+.bar{height:6px;border-radius:99px;background:var(--card3);overflow:hidden;margin:18px 0 6px}
+.bar i{display:block;height:100%;width:0;background:var(--orange);border-radius:inherit;transition:width .6s var(--ease)}
+.bar-lab{display:flex;justify-content:space-between;font-size:13px;color:var(--label2);margin-bottom:18px;font-variant-numeric:tabular-nums}
+
+/* knee */
+.q{font-size:17px;font-weight:600;line-height:1.35;margin:0 0 4px}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.choice button{min-height:52px;border-radius:16px;background:var(--card2);font-size:16px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:background .2s,color .2s,box-shadow .2s}
+.choice button.on.good{background:rgba(48,209,88,.16);color:var(--green);box-shadow:inset 0 0 0 1.5px var(--green)}
+.choice button.on.bad{background:rgba(255,69,58,.16);color:var(--red);box-shadow:inset 0 0 0 1.5px var(--red)}
+.state{display:flex;gap:12px;align-items:flex-start;margin-top:16px;padding:14px;border-radius:16px;font-size:14px;line-height:1.45}
+.state.good{background:rgba(48,209,88,.10);color:#b8f5c8}
+.state.bad{background:rgba(255,69,58,.10);color:#ffc2bd}
+.state svg{margin-top:1px}
+.state.good svg{color:var(--green)}.state.bad svg{color:var(--red)}
+
+/* grouped list */
+.list{background:var(--card);border-radius:var(--radius);overflow:hidden}
+.row{display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:12px 16px;text-align:left;position:relative}
+.row::after{content:"";position:absolute;left:62px;right:0;bottom:0;height:.5px;background:var(--sep)}
+.row:last-child::after{display:none}
+button.row:active,a.row:active{background:var(--card2)}
+.row .tx{flex:1;min-width:0}
+.row .t{font-size:17px;line-height:1.25;letter-spacing:-.2px}
+.row .s{font-size:14px;line-height:1.35;color:var(--label2);margin-top:2px}
+.row .r{color:var(--label3);display:flex;align-items:center;gap:6px;font-size:15px}
+.ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:#fff;flex:0 0 auto}
+.ic svg.i{width:19px;height:19px;stroke-width:2}
+.ic.orange{background:var(--orange)}.ic.green{background:var(--green)}.ic.blue{background:var(--blue)}
+.ic.red{background:var(--red)}.ic.pink{background:var(--pink)}.ic.purple{background:var(--purple)}
+.ic.indigo{background:var(--indigo)}.ic.teal{background:var(--teal)}.ic.yellow{background:#e5b800}
+.ic.gray{background:#636366}
+a.row{color:inherit;text-decoration:none}
+
+/* note */
+.note{display:flex;gap:12px;align-items:flex-start;padding:16px;border-radius:var(--radius);background:var(--card);font-size:14px;line-height:1.45;color:var(--label2)}
+.note b{display:block;color:#fff;font-size:15px;margin-bottom:2px}
+.note > svg{color:var(--yellow);margin-top:1px}
+
+/* segmented */
+.seg-lab{font-size:13px;font-weight:600;color:var(--label2);margin:22px 4px 8px}
+.seg{position:relative;display:grid;grid-template-columns:repeat(var(--n),1fr);background:rgba(118,118,128,.24);border-radius:12px;padding:2px}
+.seg .thumb{position:absolute;top:2px;bottom:2px;left:2px;width:calc((100% - 4px) / var(--n));border-radius:10px;background:#636366;
+  box-shadow:0 3px 8px rgba(0,0,0,.18),0 3px 1px rgba(0,0,0,.04);transform:translateX(calc(100% * var(--i,0)));transition:transform .32s var(--ease)}
+.seg button{position:relative;z-index:1;min-height:36px;font-size:14px;font-weight:600;color:#fff;border-radius:10px}
+
+/* chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;background:var(--card2);font-size:14px;font-weight:500;color:#e5e5ea}
+.chip.orange{background:rgba(255,159,10,.15);color:#ffc266}
+.chip.green{background:rgba(48,209,88,.14);color:#8ef0a7}
+.chip.red{background:rgba(255,69,58,.14);color:#ff9f99}
+.chip.blue{background:rgba(10,132,255,.16);color:#8cc4ff}
+
+/* banner */
+.banner{display:flex;gap:12px;align-items:flex-start;margin-top:16px;padding:14px 16px;border-radius:18px;background:rgba(255,69,58,.12);font-size:14px;line-height:1.45;color:#ffc2bd}
+.banner svg{color:var(--red);margin-top:1px}
+.banner b{color:#fff;display:block;font-size:15px;margin-bottom:2px}
+
+/* exercises */
+.ex{display:flex;align-items:center;gap:14px;min-height:76px;padding:10px 12px 10px 12px;position:relative;transition:opacity .2s}
+.ex::after{content:"";position:absolute;left:88px;right:0;bottom:0;height:.5px;background:var(--sep)}
+.ex:last-child::after{display:none}
+.ex .open{display:flex;align-items:center;gap:14px;flex:1;min-width:0;text-align:left;border-radius:14px}
+.ex .open:active .thumbfig{transform:scale(.96)}
+.thumbfig{width:62px;height:52px;border-radius:14px;background:#26262a;display:grid;place-items:center;flex:0 0 auto;overflow:hidden;transition:transform .15s}
+.thumbfig svg{width:100%;height:100%}
+.ex .t{font-size:16px;font-weight:600;letter-spacing:-.2px;line-height:1.25}
+.ex .s{font-size:13px;color:var(--label2);margin-top:3px;line-height:1.35}
+.ex.off{opacity:.38}
+.ex.off .s{color:var(--red)}
+.ex.done .t{color:var(--label2)}
+.check{width:44px;height:44px;display:grid;place-items:center;flex:0 0 auto}
+.check span{width:28px;height:28px;border-radius:50%;box-shadow:inset 0 0 0 2px #545458;display:grid;place-items:center;color:transparent;transition:all .25s var(--ease)}
+.check.on span{background:var(--green);box-shadow:none;color:#002a0c;transform:scale(1.04)}
+.check span svg{width:16px;height:16px;stroke-width:3}
+.check[disabled]{pointer-events:none}
+
+/* timer */
+.timer-wrap{display:grid;place-items:center;margin:8px 0 22px}
+.tring{position:relative;width:220px;height:220px}
+.tring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.tring circle{fill:none;stroke-width:12;stroke-linecap:round}
+.tring .fg{transition:stroke-dashoffset .95s linear,stroke .3s}
+.tring .center{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.tring .time{font-size:56px;font-weight:300;letter-spacing:-1.5px;font-variant-numeric:tabular-nums;line-height:1}
+.tring .ph{font-size:15px;font-weight:600;margin-top:8px}
+.tring .rd{font-size:13px;color:var(--label2);margin-top:2px;font-variant-numeric:tabular-nums}
+.desc{font-size:15px;line-height:1.45;color:var(--label2)}
+
+/* stats */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tile{min-width:0;background:var(--card);border-radius:var(--radius);padding:16px 16px 18px}
+.tile .h{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600}
+.tile .n{font-size:28px;font-weight:700;letter-spacing:-.5px;margin-top:14px;font-variant-numeric:tabular-nums;line-height:1.05}
+.tile .n small{font-size:15px;font-weight:600;color:var(--label2);margin-left:3px;letter-spacing:0}
+.tile .u{font-size:13px;color:var(--label2);margin-top:4px}
+
+/* plate */
+.plate{display:grid;grid-template-columns:120px 1fr;gap:20px;align-items:center}
+.plate svg{width:120px;height:120px;transform:rotate(-90deg)}
+.plate circle{fill:none;stroke-width:22}
+.lg{display:grid;gap:10px}
+.lg div{display:flex;align-items:center;gap:10px;font-size:15px}
+.lg i{width:10px;height:10px;border-radius:50%;flex:0 0 auto}
+.lg b{font-variant-numeric:tabular-nums;min-width:26px}
+
+/* supplements */
+.sup-h{display:flex;align-items:center;gap:12px}
+.sup-h .t{font-size:17px;font-weight:600}
+.sup-h .chip{margin-left:auto}
+.sup-n{font-size:34px;font-weight:700;letter-spacing:-.6px;margin:16px 0 6px}
+.sup-n small{font-size:17px;font-weight:600;color:var(--label2);letter-spacing:0;margin-left:4px}
+
+/* progress */
+.prog{display:grid;grid-template-columns:112px 1fr;gap:20px;align-items:center}
+.pring{position:relative;width:112px;height:112px}
+.pring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.pring circle{fill:none;stroke-width:11;stroke-linecap:round}
+.pring .fg{transition:stroke-dashoffset 1s var(--ease)}
+.pring b{position:absolute;inset:0;display:grid;place-items:center;font-size:24px;font-weight:700;letter-spacing:-.4px;font-variant-numeric:tabular-nums}
+.p-t{font-size:17px;font-weight:600}
+.p-s{font-size:14px;line-height:1.45;color:var(--label2);margin-top:4px}
+.bars{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px;padding-top:18px;border-top:.5px solid var(--sep)}
+.bars .col{display:grid;gap:8px;justify-items:center}
+.bars .track{width:100%;height:84px;border-radius:10px;background:var(--card2);display:flex;align-items:flex-end;overflow:hidden}
+.bars .fill{width:100%;background:var(--card3);border-radius:10px;transition:height .7s var(--ease)}
+.bars .fill.full{background:var(--green)}
+.bars .fill.part{background:var(--orange)}
+.bars .k{font-size:13px;font-weight:600;color:var(--label2);font-variant-numeric:tabular-nums}
+
+/* form */
+.form .row{min-height:56px}
+.form .row::after{left:62px}
+.num{width:96px;text-align:right;background:none;border:0;outline:none;font-size:17px;color:#fff;padding:0}
+.num::placeholder{color:var(--label3)}
+.unit{color:var(--label2);font-size:17px;width:26px}
+.slider-row{display:block!important;padding:14px 16px 16px!important}
+.slider-top{display:flex;align-items:center;gap:14px}
+.slider-top .v{margin-left:auto;font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:28px;background:transparent;margin:12px 0 0}
+input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:99px;background:linear-gradient(90deg,var(--green),var(--yellow) 45%,var(--red))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;background:#fff;margin-top:-11px;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+input[type=range]::-moz-range-track{height:6px;border-radius:99px;background:linear-gradient(90deg,var(--green),var(--yellow) 45%,var(--red))}
+input[type=range]::-moz-range-thumb{width:28px;height:28px;border:0;border-radius:50%;background:#fff}
+.scale{display:flex;justify-content:space-between;font-size:12px;color:var(--label3);margin-top:2px}
+.switch{position:relative;width:51px;height:31px;flex:0 0 auto}
+.switch input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer;z-index:1}
+.switch span{position:absolute;inset:0;border-radius:99px;background:rgba(120,120,128,.32);transition:background .25s}
+.switch span::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15);transition:transform .28s var(--ease)}
+.switch input:checked + span{background:var(--red)}
+.switch input:checked + span::after{transform:translateX(20px)}
+
+.trend{display:flex;align-items:center;gap:16px}
+.trend svg{flex:1;height:56px}
+.trend .d{font-size:28px;font-weight:700;letter-spacing:-.5px;font-variant-numeric:tabular-nums}
+.trend .d small{font-size:15px;color:var(--label2);font-weight:600;margin-left:2px}
+.empty{padding:28px 20px;text-align:center;color:var(--label2);font-size:15px;line-height:1.45}
+.empty svg{color:var(--label3);width:34px;height:34px;margin-bottom:8px}
+.hrow .r{font-size:15px;color:var(--label2);font-variant-numeric:tabular-nums}
+
+/* tab bar (floating glass) */
+.tabbar{position:fixed;z-index:100;left:50%;transform:translateX(-50%);bottom:calc(10px + var(--safe-b));
+  width:min(calc(100% - 24px),560px);padding:6px;border-radius:32px;
+  background:rgba(30,30,32,.72);backdrop-filter:saturate(180%) blur(24px);-webkit-backdrop-filter:saturate(180%) blur(24px);
+  box-shadow:0 10px 40px rgba(0,0,0,.5),inset 0 0 0 .5px rgba(255,255,255,.12)}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);position:relative}
+.tab{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;border-radius:26px;color:rgba(235,235,245,.6);transition:color .2s}
+.tab svg.i{width:24px;height:24px}
+.tab span{font-size:10px;font-weight:600;letter-spacing:.1px}
+.tab.active{color:var(--orange)}
+.tabs .pill{position:absolute;top:0;bottom:0;left:0;width:20%;border-radius:26px;background:rgba(255,255,255,.09);transform:translateX(calc(100% * var(--i,0)));transition:transform .4s var(--ease)}
+
+/* sheet */
+.scrim{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .3s}
+.scrim.show{opacity:1;pointer-events:auto}
+.sheet{position:fixed;z-index:201;left:50%;bottom:0;width:min(100%,640px);max-height:92vh;overflow:auto;
+  transform:translate(-50%,105%);transition:transform .45s var(--ease);
+  background:#1c1c1e;border-radius:30px 30px 0 0;padding:8px var(--gutter) calc(24px + var(--safe-b));overscroll-behavior:contain}
+.sheet.show{transform:translate(-50%,0)}
+.grab{width:100%;padding:6px 0 10px;display:grid;place-items:center;touch-action:none}
+.grab i{width:36px;height:5px;border-radius:99px;background:#545458}
+.sheet-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.sheet-h h2{font-size:26px;font-weight:700;letter-spacing:-.4px;margin:0;line-height:1.15}
+.sheet-h .sub{font-size:15px;color:var(--label2);margin-top:4px}
+.xbtn{width:32px;height:32px;border-radius:50%;background:var(--card2);display:grid;place-items:center;color:var(--label2);flex:0 0 auto}
+.demo{margin:20px 0 16px;border-radius:22px;background:radial-gradient(120% 100% at 50% 0%,#2a2a2e,#141416);aspect-ratio:5/3;display:grid;place-items:center;overflow:hidden}
+.demo svg{width:100%;height:100%}
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:14px}
+.steps li{display:flex;gap:14px;align-items:flex-start;font-size:16px;line-height:1.45}
+.steps li i{width:26px;height:26px;border-radius:50%;background:var(--card2);display:grid;place-items:center;font-style:normal;font-size:14px;font-weight:700;color:var(--orange);flex:0 0 auto}
+.sheet .sec-t{font-size:20px;font-weight:700;letter-spacing:-.3px;margin:26px 0 14px}
+.caution{display:flex;gap:12px;align-items:flex-start;margin:24px 0 20px;padding:14px 16px;border-radius:18px;background:rgba(255,214,10,.10);font-size:14px;line-height:1.45;color:#f5e6a8}
+.caution svg{color:var(--yellow);margin-top:1px}
+
+/* toast */
+.toast{position:fixed;z-index:300;left:50%;top:calc(var(--safe-t) + 14px);transform:translate(-50%,-140%);
+  display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:99px;background:rgba(44,44,46,.92);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);font-size:15px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.4);
+  transition:transform .45s var(--ease);white-space:nowrap}
+.toast.show{transform:translate(-50%,0)}
+.toast svg{color:var(--green)}
+.toast.warn svg{color:var(--orange)}
+
+/* photos + hero */
+.hero{position:relative;border-radius:var(--radius);overflow:hidden;background:var(--card)}
+.hero .img{position:relative;height:200px;overflow:hidden}
+.hero .img img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02)}
+.hero .img::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(28,28,30,.55) 70%,var(--card) 100%)}
+.hero .over{position:absolute;left:20px;right:20px;bottom:6px;z-index:1}
+.hero .body{padding:4px 20px 20px}
+.thumbfig img{width:100%;height:100%;object-fit:cover;display:block}
+.wo-hero{position:relative;height:180px;border-radius:var(--radius);overflow:hidden;margin-top:18px;background:var(--card)}
+.wo-hero img{width:100%;height:100%;object-fit:cover;display:block}
+.wo-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.78))}
+.wo-hero .over{position:absolute;left:18px;right:18px;bottom:16px;z-index:1}
+.wo-hero .k{font-size:13px;font-weight:600;color:var(--orange)}
+.wo-hero .h{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-top:2px}
+.badge-play{position:absolute;right:6px;bottom:6px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.6);display:grid;place-items:center;color:#fff;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.badge-play svg.i{width:10px;height:10px}
+.thumbfig{position:relative}
+
+/* viewer */
+.viewer{margin:20px 0 0}
+.stage{position:relative;border-radius:22px;overflow:hidden;background:radial-gradient(120% 100% at 50% 0%,#2a2a2e,#141416);aspect-ratio:3/2}
+.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .45s ease}
+.stage img.on{opacity:1}
+.stage svg{position:absolute;inset:0;width:100%;height:100%}
+.stage .cap{position:absolute;left:12px;top:12px;z-index:2;padding:6px 11px;border-radius:99px;background:rgba(0,0,0,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:13px;font-weight:600}
+.stage .note{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;padding:8px 12px;border-radius:12px;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font-size:12px;line-height:1.35;color:#e5e5ea}
+.vctl{display:flex;align-items:center;gap:10px;margin-top:12px}
+.vplay{width:44px;height:44px;border-radius:50%;background:var(--card2);display:grid;place-items:center;flex:0 0 auto;color:#fff}
+.vplay svg.i{width:18px;height:18px}
+.frames{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px;flex:1}
+.frames button{min-height:44px;border-radius:12px;background:var(--card2);font-size:13px;font-weight:600;color:var(--label2);transition:all .2s}
+.frames button.on{background:rgba(255,159,10,.18);color:var(--orange);box-shadow:inset 0 0 0 1.5px var(--orange)}
+.vmode{margin-bottom:12px}
+
+/* figure strokes */
+.fg-l{stroke:#f2f2f7;stroke-width:7;stroke-linecap:round;fill:none}
+.fg-b{stroke:#636366;stroke-width:7;stroke-linecap:round;fill:none}
+.fg-o{stroke:var(--orange);stroke-width:7;stroke-linecap:round;fill:none}
+.fg-p{stroke:#48484a;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.fg-floor{stroke:#3a3a3c;stroke-width:2;stroke-dasharray:2 6;stroke-linecap:round}
+
+@media (max-width:380px){
+  .tile .n{font-size:22px}.tile{padding:14px}
+  .plate{grid-template-columns:100px 1fr;gap:16px}.plate svg{width:100px;height:100px}
+  :root{--gutter:16px}
+  .rings-card{grid-template-columns:112px 1fr;gap:16px}.rings{width:112px;height:112px}
+  .legend .val{font-size:19px}
+  .tring{width:196px;height:196px}.tring .time{font-size:48px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-rings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.5"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-dumbbell" viewBox="0 0 24 24"><rect x="1.8" y="9.2" width="2.6" height="5.6" rx="1"/><rect x="4.4" y="6.5" width="3.6" height="11" rx="1.3"/><path d="M8 12h8"/><rect x="16" y="6.5" width="3.6" height="11" rx="1.3"/><rect x="19.6" y="9.2" width="2.6" height="5.6" rx="1"/></symbol>
+    <symbol id="i-fork" viewBox="0 0 24 24"><path d="M6 3v6a2.5 2.5 0 0 0 5 0V3M8.5 3v18"/><path d="M18 21V3c-2.2 1.2-3.5 4-3.5 7.5V14H18"/></symbol>
+    <symbol id="i-pill" viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="8" rx="4" transform="rotate(-45 12 12)"/><path d="m9.2 9.2 5.6 5.6"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3.5 20.5h17"/><rect x="5" y="12" width="3.4" height="5.5" rx="1.2"/><rect x="10.3" y="8" width="3.4" height="9.5" rx="1.2"/><rect x="15.6" y="4" width="3.4" height="13.5" rx="1.2"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-checkc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="m7.8 12.3 3 3 5.5-6"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+    <symbol id="i-xc" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="m9 9 6 6M15 9l-6 6"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M10.3 4.2 2.6 17.6A2 2 0 0 0 4.3 20.6h15.4a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4.2M12 17h.01"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 11v5.5M12 7.6h.01"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7.5 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8a1 1 0 0 0-1.5.86z" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4" height="14" rx="1.3" fill="currentColor" stroke="none"/><rect x="14" y="5" width="4" height="14" rx="1.3" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5V12l3 2"/></symbol>
+    <symbol id="i-gauge" viewBox="0 0 24 24"><path d="M4.5 17a8.5 8.5 0 1 1 15 0"/><path d="m12 13 3.5-4"/><circle cx="12" cy="13" r="1.2" fill="currentColor"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6.5h11M9 12h11M9 17.5h11"/><circle cx="4.5" cy="6.5" r="1" fill="currentColor"/><circle cx="4.5" cy="12" r="1" fill="currentColor"/><circle cx="4.5" cy="17.5" r="1" fill="currentColor"/></symbol>
+    <symbol id="i-pulse" viewBox="0 0 24 24"><path d="M2.5 12.5h4l2.2-5 4.6 10 2.4-5h5.8"/></symbol>
+    <symbol id="i-fish" viewBox="0 0 24 24"><path d="M5.5 12c3-4 6.5-5.5 9.5-5.5 3.6 0 6.2 2.7 7 5.5-.8 2.8-3.4 5.5-7 5.5-3 0-6.5-1.5-9.5-5.5z"/><path d="M5.5 12 2 8.5v7z"/><circle cx="17" cy="11" r=".9" fill="currentColor" stroke="none"/></symbol>
+    <symbol id="i-wheat" viewBox="0 0 24 24"><path d="M12 21.5V8"/><path d="M12 17c-3 0-4.5-2-4.5-4.2 3 0 4.5 2 4.5 4.2zM12 17c3 0 4.5-2 4.5-4.2-3 0-4.5 2-4.5 4.2zM12 12c-3 0-4.5-2-4.5-4.2 3 0 4.5 2 4.5 4.2zM12 12c3 0 4.5-2 4.5-4.2-3 0-4.5 2-4.5 4.2zM12 8c-1.5-1-2-2.6-1.2-4.5C12.3 4.2 12.8 6 12 8z"/></symbol>
+    <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19.5c-.5-9 5-15 15.5-15 .3 10.5-5.5 16-14.6 15.2"/><path d="M5 19.5 14 10.5"/></symbol>
+    <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 3s6.5 6.8 6.5 11.3a6.5 6.5 0 0 1-13 0C5.5 9.8 12 3 12 3z"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13.5 2.5 4.5 14h7l-1 7.5 9-11.5h-7z"/></symbol>
+    <symbol id="i-cup" viewBox="0 0 24 24"><path d="M6 7h12l-1.4 12.2a2 2 0 0 1-2 1.8H9.4a2 2 0 0 1-2-1.8z"/><path d="M5 7h14M9.5 3.5h5l1 3.5"/></symbol>
+    <symbol id="i-scale" viewBox="0 0 24 24"><rect x="3" y="3.5" width="18" height="17" rx="4.5"/><path d="M8.2 10a4 4 0 0 1 7.6 0"/><path d="m12 10.2 1.6-2.2"/></symbol>
+    <symbol id="i-ruler" viewBox="0 0 24 24"><rect x="2" y="7.5" width="20" height="9" rx="2.2"/><path d="M6 7.5V11M10 7.5v5M14 7.5V11M18 7.5v5"/></symbol>
+    <symbol id="i-knee" viewBox="0 0 24 24"><path d="M8 2.5v6.2c0 2 1 3.3 2.6 4l1 .5c1.4.6 2 1.9 1.7 3.4l-1.1 5"/><path d="M14.5 2.5v5.7c0 1.2.5 2.2 1.3 3"/><circle cx="16.8" cy="13.4" r="1.6"/></symbol>
+    <symbol id="i-drops" viewBox="0 0 24 24"><path d="M8 3.5s4.5 4.7 4.5 7.8a4.5 4.5 0 0 1-9 0C3.5 8.2 8 3.5 8 3.5z"/><path d="M16.5 11s3.5 3.6 3.5 6a3.5 3.5 0 0 1-7 0"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M9 7h8v8"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2.8c.8 3.7 5.5 5.2 5.5 10.6a5.5 5.5 0 0 1-11 0c0-2.6 1.4-4.3 2.5-5.3.4 2 1.4 3 2.6 3.2C11.3 8.5 11 5.6 12 2.8z"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v15M6 13l6 6 6-6"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6.5C10.5 5 8 4.5 3.5 4.5v14c4.5 0 7 .5 8.5 2 1.5-1.5 4-2 8.5-2v-14C16 4.5 13.5 5 12 6.5zM12 6.5v14"/></symbol>
+  </defs>
+</svg>
+
+<div class="app">
+  <main>
+
+    <!-- RESUMEN -->
+    <section id="page-home" class="page active">
+      <div class="lt">
+        <div>
+          <div class="date" id="todayDate"></div>
+          <h1>Resumen</h1>
+        </div>
+        <div class="avatar" aria-hidden="true">D</div>
+      </div>
+
+      <div class="section" style="margin-top:20px">
+        <div class="card rings-card">
+          <svg class="rings" viewBox="0 0 132 132" aria-hidden="true">
+            <g transform="rotate(-90 66 66)">
+              <circle cx="66" cy="66" r="57" stroke="rgba(250,17,79,.22)" stroke-width="16"/>
+              <circle class="fg" id="ringA" cx="66" cy="66" r="57" stroke="var(--pink)" stroke-width="16" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+              <circle cx="66" cy="66" r="39" stroke="rgba(48,209,88,.22)" stroke-width="16"/>
+              <circle class="fg" id="ringB" cx="66" cy="66" r="39" stroke="var(--green)" stroke-width="16" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+              <circle cx="66" cy="66" r="21" stroke="rgba(0,212,230,.22)" stroke-width="16"/>
+              <circle class="fg" id="ringC" cx="66" cy="66" r="21" stroke="var(--cyan)" stroke-width="16" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+            </g>
+          </svg>
+          <div class="legend">
+            <div><div class="lab">Fase actual</div><div class="val c-pink" id="lgA">0<small>%</small></div></div>
+            <div><div class="lab">Sesión de hoy</div><div class="val c-green" id="lgB">0/6</div></div>
+            <div><div class="lab">Programa</div><div class="val c-cyan" id="lgC">sem 1<small>/8</small></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sh"><h2>Sesión de hoy</h2></div>
+        <div class="hero">
+          <div class="img"><img id="todayImg" src="img/ex/push-2.jpg" alt="" decoding="async" /></div>
+          <div class="body">
+          <div class="kicker" id="todayKicker">Semanas 1–2</div>
+          <div class="big-title" id="todayTitle">Día A</div>
+          <div class="meta">
+            <span><svg class="i sm"><use href="#i-list"/></svg><b id="todayCount">6</b>&nbsp;ejercicios</span>
+            <span><svg class="i sm"><use href="#i-clock"/></svg><span id="todayMin">35 min</span></span>
+            <span><svg class="i sm"><use href="#i-gauge"/></svg><span id="todayRpe">RPE 5–6</span></span>
+          </div>
+          <div class="bar"><i id="todayBar"></i></div>
+          <div class="bar-lab"><span id="todayDone">0 de 6 completados</span><span id="todayPct">0%</span></div>
+          <button class="btn primary" id="todayCta"><svg class="i"><use href="#i-play"/></svg><span>Empezar entrenamiento</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section" id="kneeSection">
+        <div class="sh"><h2>Chequeo de rodilla</h2></div>
+        <div class="card">
+          <p class="q">¿Tu rodilla izquierda está hinchada o amaneció más inflamada?</p>
+          <p class="lead" style="margin:0;font-size:14px">Contesta antes de entrenar, ajusta la sesión de hoy automáticamente.</p>
+          <div class="choice">
+            <button id="kneeNo" class="good"><svg class="i sm"><use href="#i-check"/></svg>No, todo bien</button>
+            <button id="kneeYes" class="bad"><svg class="i sm"><use href="#i-drops"/></svg>Sí, hinchada</button>
+          </div>
+          <div id="kneeState"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sh"><h2>Atajos</h2></div>
+        <div class="list">
+          <button class="row" data-jump="nutrition">
+            <span class="ic green"><svg class="i"><use href="#i-fork"/></svg></span>
+            <span class="tx"><span class="t" style="display:block">Nutrición</span><span class="s" style="display:block">Proteína, plato diario y compras</span></span>
+            <span class="r"><svg class="i sm"><use href="#i-chev"/></svg></span>
+          </button>
+          <button class="row" data-jump="progress">
+            <span class="ic blue"><svg class="i"><use href="#i-chart"/></svg></span>
+            <span class="tx"><span class="t" style="display:block">Registrar progreso</span><span class="s" style="display:block">Peso, cintura y rodilla</span></span>
+            <span class="r"><svg class="i sm"><use href="#i-chev"/></svg></span>
+          </button>
+          <button class="row" data-jump="supplements">
+            <span class="ic purple"><svg class="i"><use href="#i-pill"/></svg></span>
+            <span class="tx"><span class="t" style="display:block">Suplementos</span><span class="s" style="display:block">Solo lo que sí aporta</span></span>
+            <span class="r"><svg class="i sm"><use href="#i-chev"/></svg></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="note">
+          <svg class="i"><use href="#i-warn"/></svg>
+          <div><b>La inflamación recurrente merece valoración</b>Esta rutina cuida la carga, pero no sustituye una evaluación de medicina del deporte, traumatología o fisioterapia.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ENTRENAR -->
+    <section id="page-workout" class="page">
+      <div class="lt"><div><h1>Entrenar</h1></div></div>
+      <p class="lead">Fuerza progresiva, bajo impacto y nunca sobre dolor articular.</p>
+      <div class="wo-hero"><img id="woImg" src="img/ex/row-2.jpg" alt="" decoding="async" /><div class="over"><div class="k" id="woK">Semanas 1–2</div><div class="h" id="woH">Readaptación</div></div></div>
+
+      <div class="seg-lab">Semanas</div>
+      <div class="seg" id="weekSeg" style="--n:4">
+        <span class="thumb"></span>
+        <button data-phase="1">1–2</button><button data-phase="3">3–4</button><button data-phase="5">5–6</button><button data-phase="7">7–8</button>
+      </div>
+      <div class="seg-lab">Sesión</div>
+      <div class="seg" id="daySeg" style="--n:3">
+        <span class="thumb"></span>
+        <button data-day="A">Día A</button><button data-day="B">Día B</button><button data-day="C">Día C</button>
+      </div>
+
+      <div class="chips" style="margin-top:18px" id="phaseChips"></div>
+      <div id="kneeBanner"></div>
+
+      <div class="section" style="margin-top:22px">
+        <div class="sh"><h2 id="dayTitle">Día A</h2><span class="c-muted" style="font-size:15px;font-variant-numeric:tabular-nums" id="dayCount">0/6</span></div>
+        <div class="list" id="exerciseList"></div>
+        <p class="foot">Toca un ejercicio para ver cómo hacerlo.</p>
+      </div>
+
+      <div class="section">
+        <div class="sh"><h2>Cardio final</h2></div>
+        <div class="card">
+          <p class="desc" id="finisherText"></p>
+          <div class="list" style="background:var(--card2);margin:16px 0 4px" id="cardioList"></div>
+          <div class="timer-wrap">
+            <div class="tring">
+              <svg viewBox="0 0 220 220" aria-hidden="true">
+                <circle cx="110" cy="110" r="100" stroke="var(--card2)"/>
+                <circle class="fg" id="tRing" cx="110" cy="110" r="100" stroke="var(--orange)" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"/>
+              </svg>
+              <div class="center"><div>
+                <div class="time" id="tTime">0:45</div>
+                <div class="ph c-orange" id="tPhase">Trabajo</div>
+                <div class="rd" id="tRound">Ronda 1 de 6</div>
+              </div></div>
+            </div>
+          </div>
+          <button class="btn primary" id="tStart"><svg class="i"><use href="#i-play"/></svg><span>Iniciar</span></button>
+          <button class="btn gray" id="tReset"><svg class="i"><use href="#i-reset"/></svg><span>Reiniciar</span></button>
+          <p class="foot" style="margin:14px 2px 0">Boxeo sentado o caminata rápida, solo si no hay dolor ni nueva inflamación.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMIDA -->
+    <section id="page-nutrition" class="page">
+      <div class="lt"><div><h1>Nutrición</h1></div></div>
+      <p class="lead">Comida simple para recuperar músculo y bajar grasa sin dieta extrema.</p>
+
+      <div class="section" style="margin-top:24px">
+        <div class="tiles">
+          <div class="tile">
+            <div class="h c-orange"><svg class="i sm"><use href="#i-fish"/></svg>Proteína</div>
+            <div class="n">120–130<small>g</small></div>
+            <div class="u">al día, prioridad #1</div>
+          </div>
+          <div class="tile">
+            <div class="h c-blue"><svg class="i sm"><use href="#i-down"/></svg>Ritmo</div>
+            <div class="n">0.25–0.5<small>kg</small></div>
+            <div class="u">de pérdida por semana</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sh"><h2>Plato diario</h2></div>
+        <div class="card">
+          <div class="plate">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle cx="60" cy="60" r="44" stroke="var(--green)" pathLength="100" stroke-dasharray="49 51" stroke-dashoffset="0"/>
+              <circle cx="60" cy="60" r="44" stroke="var(--orange)" pathLength="100" stroke-dasharray="24 76" stroke-dashoffset="-50"/>
+              <circle cx="60" cy="60" r="44" stroke="var(--yellow)" pathLength="100" stroke-dasharray="24 76" stroke-dashoffset="-75"/>
+            </svg>
+            <div class="lg">
+              <div><i style="background:var(--green)"></i><b>½</b>Verduras</div>
+              <div><i style="background:var(--orange)"></i><b>¼</b>Proteína</div>
+              <div><i style="background:var(--yellow)"></i><b>¼</b>Carbohidrato</div>
+              <div class="c-muted" style="font-size:14px"><i style="background:var(--card3)"></i>Grasa moderada</div>
+            </div>
+          </div>
+        </div>
+        <p class="foot">No necesitas productos fitness. La comida real y repetible gana.</p>
+      </div>
+
+      <div class="section">
+        <div class="sh"><h2>Lista de compra</h2></div>
+        <div class="list">
+          <div class="row"><span class="ic orange"><svg class="i"><use href="#i-fish"/></svg></span><span class="tx"><span class="t" style="display:block">Proteínas</span><span class="s" style="display:block">Huevo, pollo, atún, sardina, carne magra, yogurt griego</span></span></div>
+          <div class="row"><span class="ic yellow"><svg class="i"><use href="#i-wheat"/></svg></span><span class="tx"><span class="t" style="display:block">Carbohidratos</span><span class="s" style="display:block">Avena, arroz, papa, tortilla, fruta</span></span></div>
+          <div class="row"><span class="ic green"><svg class="i"><use href="#i-leaf"/></svg></span><span class="tx"><span class="t" style="display:block">Vegetales</span><span class="s" style="display:block">Frescos o congelados, ambos funcionan</span></span></div>
+          <div class="row"><span class="ic teal"><svg class="i"><use href="#i-drop"/></svg></span><span class="tx"><span class="t" style="display:block">Grasas</span><span class="s" style="display:block">Aguacate, nueces, aceite de oliva o canola</span></span></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sh"><h2>Reduce primero</h2></div>
+        <div class="card">
+          <div class="chips">
+            <span class="chip red">Refresco</span><span class="chip red">Jugos azucarados</span><span class="chip red">Pan dulce</span>
+            <span class="chip red">Botanas</span><span class="chip red">Postres frecuentes</span><span class="chip red">Alcohol frecuente</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUPLEMENTOS -->
+    <section id="page-supplements" class="page">
+      <div class="lt"><div><h1>Suplementos</h1></div></div>
+      <p class="lead">Solo lo que realmente aporta valor.</p>
+
+      <div class="section stack" style="margin-top:24px">
+        <div class="card">
+          <div class="sup-h"><span class="ic purple"><svg class="i"><use href="#i-bolt"/></svg></span><span class="t">Creatina monohidratada</span><span class="chip">Opcional</span></div>
+          <div class="sup-n">3–5<small>g al día</small></div>
+          <p class="desc">Sin fase de carga. Puede subir un poco el peso por agua dentro del músculo, es normal.</p>
+        </div>
+        <div class="card">
+          <div class="sup-h"><span class="ic blue"><svg class="i"><use href="#i-cup"/></svg></span><span class="t">Proteína whey</span><span class="chip">Si la necesitas</span></div>
+          <div class="sup-n">20–30<small>g por toma</small></div>
+          <p class="desc">Úsala solo si te ayuda a llegar a tu proteína diaria con comodidad.</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sh"><h2>No priorizaría</h2></div>
+        <div class="card">
+          <div class="chips">
+            <span class="chip red"><svg class="i xs"><use href="#i-x"/></svg>Quemadores</span>
+            <span class="chip red"><svg class="i xs"><use href="#i-x"/></svg>BCAA</span>
+            <span class="chip red"><svg class="i xs"><use href="#i-x"/></svg>Detox</span>
+            <span class="chip red"><svg class="i xs"><use href="#i-x"/></svg>Test boosters</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sh"><h2>Fuentes</h2></div>
+        <div class="list">
+          <a class="row" href="https://orthoinfo.aaos.org/en/recovery/knee-conditioning-program/" target="_blank" rel="noopener"><span class="ic gray"><svg class="i"><use href="#i-book"/></svg></span><span class="tx"><span class="t" style="display:block">AAOS</span><span class="s" style="display:block">Knee Conditioning Program</span></span><span class="r"><svg class="i sm"><use href="#i-arrow"/></svg></span></a>
+          <a class="row" href="https://odphp.health.gov/our-work/nutrition-physical-activity/physical-activity-guidelines" target="_blank" rel="noopener"><span class="ic gray"><svg class="i"><use href="#i-book"/></svg></span><span class="tx"><span class="t" style="display:block">U.S. HHS</span><span class="s" style="display:block">Physical Activity Guidelines</span></span><span class="r"><svg class="i sm"><use href="#i-arrow"/></svg></span></a>
+          <a class="row" href="https://www.who.int/news-room/fact-sheets/detail/physical-activity" target="_blank" rel="noopener"><span class="ic gray"><svg class="i"><use href="#i-book"/></svg></span><span class="tx"><span class="t" style="display:block">OMS</span><span class="s" style="display:block">Recomendaciones de actividad física</span></span><span class="r"><svg class="i sm"><use href="#i-arrow"/></svg></span></a>
+          <a class="row" href="https://ods.od.nih.gov/factsheets/ExerciseAndAthleticPerformance-HealthProfessional/" target="_blank" rel="noopener"><span class="ic gray"><svg class="i"><use href="#i-book"/></svg></span><span class="tx"><span class="t" style="display:block">NIH ODS</span><span class="s" style="display:block">Exercise and Athletic Performance</span></span><span class="r"><svg class="i sm"><use href="#i-arrow"/></svg></span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROGRESO -->
+    <section id="page-progress" class="page">
+      <div class="lt"><div><h1>Progreso</h1></div></div>
+      <p class="lead">Fuerza, cintura, peso y cómo responde tu rodilla.</p>
+
+      <div class="section" style="margin-top:24px">
+        <div class="card">
+          <div class="prog">
+            <div class="pring">
+              <svg viewBox="0 0 112 112" aria-hidden="true">
+                <circle cx="56" cy="56" r="48" stroke="rgba(48,209,88,.2)"/>
+                <circle class="fg" id="pRing" cx="56" cy="56" r="48" stroke="var(--green)" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"/>
+              </svg>
+              <b id="pPct">0%</b>
+            </div>
+            <div>
+              <div class="p-t" id="pTitle">Semanas 1–2</div>
+              <div class="p-s">Completa tus 3 sesiones sin que la rodilla amanezca peor al día siguiente.</div>
+            </div>
+          </div>
+          <div class="bars" id="pBars"></div>
+        </div>
+      </div>
+
+      <div class="section" id="trendSection" hidden>
+        <div class="sh"><h2>Tendencia de peso</h2></div>
+        <div class="card trend">
+          <div><div class="d" id="trendD">0<small>kg</small></div><div class="c-muted" style="font-size:13px;margin-top:2px" id="trendL">desde tu primer registro</div></div>
+          <svg id="trendSvg" viewBox="0 0 200 56" preserveAspectRatio="none" aria-hidden="true"></svg>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="sh"><h2>Registrar hoy</h2></div>
+        <div class="list form">
+          <label class="row"><span class="ic indigo"><svg class="i"><use href="#i-scale"/></svg></span><span class="tx t">Peso</span><input id="wIn" class="num" type="number" inputmode="decimal" step="0.1" placeholder="0.0" /><span class="unit">kg</span></label>
+          <label class="row"><span class="ic teal"><svg class="i"><use href="#i-ruler"/></svg></span><span class="tx t">Cintura</span><input id="waIn" class="num" type="number" inputmode="decimal" step="0.1" placeholder="0.0" /><span class="unit">cm</span></label>
+          <div class="row slider-row">
+            <div class="slider-top"><span class="ic pink"><svg class="i"><use href="#i-pulse"/></svg></span><span class="t">Dolor de rodilla</span><span class="v" id="painV">0/10</span></div>
+            <input id="painIn" type="range" min="0" max="10" step="1" value="0" aria-label="Dolor de rodilla de 0 a 10" />
+            <div class="scale"><span>Sin dolor</span><span>Moderado</span><span>Fuerte</span></div>
+          </div>
+          <label class="row"><span class="ic red"><svg class="i"><use href="#i-drops"/></svg></span><span class="tx t">Hinchazón</span><span class="switch"><input id="swIn" type="checkbox" aria-label="Hinchazón" /><span></span></span></label>
+        </div>
+        <div style="margin-top:16px"><button class="btn primary" id="saveLog">Guardar registro</button></div>
+      </div>
+
+      <div class="section">
+        <div class="sh"><h2>Historial</h2></div>
+        <div class="list" id="historyList"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="tabbar" aria-label="Navegación principal">
+  <div class="tabs" id="tabs">
+    <span class="pill"></span>
+    <button class="tab active" data-page="home"><svg class="i"><use href="#i-rings"/></svg><span>Resumen</span></button>
+    <button class="tab" data-page="workout"><svg class="i"><use href="#i-dumbbell"/></svg><span>Entrenar</span></button>
+    <button class="tab" data-page="nutrition"><svg class="i"><use href="#i-fork"/></svg><span>Comida</span></button>
+    <button class="tab" data-page="supplements"><svg class="i"><use href="#i-pill"/></svg><span>Suplementos</span></button>
+    <button class="tab" data-page="progress"><svg class="i"><use href="#i-chart"/></svg><span>Progreso</span></button>
+  </div>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sTitle">
+  <div class="grab" id="grab"><i></i></div>
+  <div class="sheet-h">
+    <div><h2 id="sTitle">Ejercicio</h2><div class="sub" id="sSub"></div></div>
+    <button class="xbtn" id="sClose" aria-label="Cerrar"><svg class="i sm" style="stroke-width:2.6"><use href="#i-x"/></svg></button>
+  </div>
+  <div class="viewer">
+    <div class="seg vmode" id="vMode" style="--n:2"><span class="thumb"></span><button data-m="photo">Fotos</button><button data-m="anim">Animación</button></div>
+    <div class="stage" id="vStage"></div>
+    <div class="vctl"><button class="vplay" id="vPlay" aria-label="Pausar"></button><div class="frames" id="vFrames"></div></div>
+  </div>
+  <div class="chips" id="sChips" style="margin-top:18px"></div>
+  <div class="sec-t">Cómo hacerlo</div>
+  <ol class="steps" id="sSteps"></ol>
+  <div class="caution"><svg class="i"><use href="#i-warn"/></svg><div id="sCaution"></div></div>
+  <button class="btn green" id="sDone"><svg class="i"><use href="#i-check"/></svg><span>Marcar como hecho</span></button>
+</div>
+
+<div class="toast" id="toast"><svg class="i"><use href="#i-checkc"/></svg><span id="toastT"></span></div>
+
+<script>
+(() => {
+  /* ---------- storage seguro ---------- */
+  const store = {
+    get(k, d = null){ try{ const v = localStorage.getItem(k); return v === null ? d : v }catch(e){ return d } },
+    set(k, v){ try{ localStorage.setItem(k, v) }catch(e){} }
+  };
+  const qs = (s, r = document) => r.querySelector(s);
+  const qsa = (s, r = document) => [...r.querySelectorAll(s)];
+  const haptic = (p = 10) => { try{ navigator.vibrate && navigator.vibrate(p) }catch(e){} };
+  const ico = (id, cls = "i") => `<svg class="${cls}"><use href="#i-${id}"/></svg>`;
+
+  /* ---------- datos ---------- */
+  const phases = {
+    1:{label:"Semanas 1–2",goal:"Readaptación",sets:2,reps:"8–10",rpe:"RPE 5–6",rounds:6,finisher:"6 rondas de 45 s de boxeo sentado más 30 s suave. Total aproximado de 7.5 min."},
+    3:{label:"Semanas 3–4",goal:"Capacidad de trabajo",sets:3,reps:"8–12",rpe:"RPE 6–7",rounds:8,finisher:"8 rondas de 45 s de boxeo sentado más 30 s suave. Total aproximado de 10 min."},
+    5:{label:"Semanas 5–6",goal:"Más estímulo muscular",sets:3,reps:"10–15",rpe:"RPE 7",rounds:10,finisher:"10 rondas de 45 s rápido más 30 s suave. O caminata de 20–25 min si la rodilla sigue tranquila."},
+    7:{label:"Semanas 7–8",goal:"Consolidar fuerza",sets:3,reps:"8–12",rpe:"RPE 7–8",rounds:12,finisher:"12 rondas de 45 s rápido más 30 s suave. O caminata o nado crawl de 25–30 min sin dolor ni hinchazón."}
+  };
+
+  const exercises = {
+    push:{name:"Lagartija inclinada",group:"Pecho, hombro y tríceps",knee:false,steps:["Apoya las manos en un escritorio o superficie estable.","Mantén cabeza, tronco y cadera alineados.","Baja el pecho con control.","Empuja sin encoger los hombros."],caution:"Deja 2 a 4 repeticiones en reserva durante las primeras semanas."},
+    row:{name:"Remo con mochila o banda",group:"Espalda y bíceps",knee:false,steps:["Apóyate con una mano en una superficie estable.","Mantén la espalda neutra y el abdomen firme.","Lleva el codo hacia la cadera.","Baja lento y evita girar el tronco."],caution:"No uses impulso ni subas el hombro hacia la oreja."},
+    press:{name:"Press de hombro sentado",group:"Hombro y tríceps",knee:false,steps:["Siéntate estable con ambos pies apoyados.","Parte con el peso a la altura de los hombros.","Empuja hacia arriba sin arquear la espalda.","Baja con control."],caution:"Reduce peso o rango si aparece dolor de hombro."},
+    curl:{name:"Curl de bíceps",group:"Bíceps",knee:false,steps:["Mantén los codos pegados al cuerpo.","Flexiona sin adelantar los hombros.","Aprieta arriba un segundo.","Baja en 2 a 3 segundos."],caution:"Evita balancear el tronco."},
+    bridge:{name:"Puente de glúteo",group:"Glúteo y cadena posterior",knee:true,steps:["Acuéstate boca arriba con las rodillas en un ángulo cómodo.","Aprieta abdomen y glúteos.","Eleva la cadera hasta formar una línea estable.","Pausa 1 a 2 s y baja lento."],caution:"Si la flexión de rodilla molesta, aleja los pies o cambia el ejercicio."},
+    quad:{name:"Contracción de cuádriceps",group:"Cuádriceps",knee:true,special:"10 repeticiones de 5 s",steps:["Extiende la pierna y relájala.","Aprieta con fuerza el frente del muslo.","Lleva suavemente la parte de atrás de la rodilla hacia la superficie.","Mantén 5 segundos y relaja."],caution:"Debe sentirse trabajo muscular, no dolor dentro de la articulación."},
+    slr:{name:"Elevación de pierna recta",group:"Cuádriceps y cadera",knee:true,steps:["Acuéstate con la pierna de trabajo recta.","Aprieta el cuádriceps antes de despegarla.","Eleva 15 a 25 cm sin doblar la rodilla.","Baja despacio."],caution:"Si aparece dolor articular, detén el ejercicio."},
+    hip:{name:"Abducción de cadera",group:"Glúteo medio",knee:true,steps:["Acuéstate de lado con la pierna de arriba recta.","Mantén el pie mirando al frente.","Eleva la pierna sin girar la cadera.","Baja de forma controlada."],caution:"No busques altura máxima, busca control."},
+    ham:{name:"Curl de isquiotibial",group:"Isquiotibiales",knee:true,steps:["Sujétate de una silla o pared.","Dobla la rodilla solo en un rango cómodo.","Pausa 1 a 2 s.","Baja lentamente."],caution:"Empieza con rango corto. Si duele dentro de la rodilla, omítelo."},
+    calf:{name:"Elevación de pantorrilla",group:"Pantorrilla",knee:true,steps:["Colócate junto a una pared o silla estable.","Mantén las rodillas casi extendidas.","Sube los talones lentamente.","Pausa arriba y baja en 2 a 3 segundos."],caution:"Empieza con ambas piernas y sin rebotes."},
+    dead:{name:"Dead bug",group:"Core",knee:false,steps:["Acuéstate boca arriba y activa el abdomen.","Mantén la espalda baja estable.","Extiende lento brazo y pierna contrarios.","Regresa y alterna."],caution:"Si cuesta, mueve solo brazos o solo piernas."}
+  };
+
+  const PHOTOS = {push:1,row:1,press:1,curl:1,bridge:1,hip:1,calf:1,dead:1,walk:1}
+  const photoNote = {hip:"En la foto se ve la variante de pie. En tu rutina hazlo acostado de lado, como en la animación."}
+  const photoOf = id => PHOTOS[id] ? [`img/ex/${id}-1.jpg`, `img/ex/${id}-2.jpg`] : null
+
+  const cardio = {
+    box:{name:"Boxeo sentado",group:"Cardio sin impacto",steps:["Siéntate al borde de una silla firme con los pies bien apoyados.","Activa el abdomen y sube las manos a la altura de la cara.","Lanza golpes rectos alternando brazos, girando un poco el tronco.","Regresa la mano a la guardia en cada golpe.","En el bloque rápido acelera el ritmo, en el suave baja a la mitad."],caution:"No bloquees los codos al extender. Mantén los hombros relajados y respira constante."},
+    walk:{name:"Caminata rápida",group:"Cardio de bajo impacto",steps:["Usa tenis con buena amortiguación y superficie plana.","Camina erguido, mirada al frente y brazos en 90°.","Da pasos cortos y rápidos, apoyando talón y luego punta.","Busca un ritmo en el que puedas hablar pero no cantar."],caution:"Evita bajadas pronunciadas. Si la rodilla se inflama después, vuelve al boxeo sentado."},
+    swim:{name:"Nado crawl",group:"Cardio sin impacto",steps:["Flota boca abajo con el cuerpo alineado y la cara en el agua.","Alterna brazos, uno entra al frente mientras el otro empuja hacia la cadera.","Patea suave desde la cadera, con rodillas casi rectas.","Gira la cabeza de lado para respirar cada 2 o 3 brazadas."],caution:"Evita la patada de pecho (braza), es la que más carga la rodilla."}
+  }
+  const allEx = id => exercises[id] || cardio[id]
+
+  const plans = {
+    A:["push","row","bridge","quad","calf","dead"],
+    B:["press","row","slr","hip","ham","curl"],
+    C:["push","row","press","bridge","hip","calf","dead"]
+  };
+
+  /* ---------- figuras animadas (poses inicio → control) ---------- */
+  const POSES = {
+    push:{focus:["arm","torso"],props:'<rect class="fg-p" x="134" y="62" width="50" height="5" rx="2.5"/><path class="fg-p" d="M140 67v37M178 67v37"/>',
+      s:{ha:[146,58],ft:[30,104]},
+      a:{head:[120,48],sh:[112,56],el:[129,58],hip:[74,79],kn:[52,92]},
+      b:{head:[129,63],sh:[120,70],el:[127,54],hip:[78,86],kn:[54,95]}},
+    row:{focus:["arm"],weight:true,props:'<rect class="fg-p" x="118" y="70" width="58" height="5" rx="2.5"/><path class="fg-p" d="M124 75v29M170 75v29"/>',
+      s:{head:[118,46],sh:[106,52],hip:[66,62],kn:[64,83],ft:[60,104],el2:[114,61],ha2:[124,68]},
+      a:{el:[104,70],ha:[104,87]},
+      b:{el:[89,44],ha:[97,60]}},
+    press:{focus:["arm"],weight:true,props:'<path class="fg-p" d="M56 81h40M60 81v23M92 81v23M56 81V42"/>',
+      s:{head:[76,27],sh:[76,40],hip:[76,78],kn:[100,78],ft:[102,104]},
+      a:{el:[87,54],ha:[85,38]},
+      b:{el:[81,23],ha:[82,6]}},
+    curl:{focus:["arm"],weight:true,props:"",
+      s:{head:[90,13],sh:[90,26],hip:[90,61],kn:[91,83],ft:[92,104],kn2:[88,83],ft2:[84,104]},
+      a:{el:[92,44],ha:[95,62]},
+      b:{el:[92,44],ha:[106,30]}},
+    bridge:{focus:["torso","thigh"],props:"",
+      s:{head:[34,96],sh:[46,100],el:[62,102],ha:[78,102],ft:[128,103]},
+      a:{hip:[86,101],kn:[112,82]},
+      b:{hip:[90,80],kn:[117,71]}},
+    quad:{focus:["thigh"],props:"",
+      s:{head:[52,49],sh:[58,62],el:[50,82],ha:[44,101],hip:[72,98],kn2:[92,80],ft2:[106,103]},
+      a:{kn:[100,99],ft:[128,99]},
+      b:{kn:[100,101],ft:[128,94]}},
+    slr:{focus:["leg"],props:"",
+      s:{head:[30,95],sh:[42,99],el:[58,101],ha:[74,101],hip:[82,100],kn2:[104,82],ft2:[118,103]},
+      a:{kn:[108,100],ft:[134,100]},
+      b:{kn:[106,88],ft:[128,75]}},
+    hip:{focus:["leg"],props:"",
+      s:{head:[30,92],sh:[42,98],el:[58,96],ha:[70,100],hip:[84,98],kn2:[110,100],ft2:[136,101]},
+      a:{kn:[110,96],ft:[136,96]},
+      b:{kn:[108,85],ft:[132,73]}},
+    ham:{focus:["leg"],props:'<path class="fg-p" d="M124 60v44M124 60h26M150 60v44M124 78h26"/>',
+      s:{head:[90,14],sh:[90,26],el:[107,42],ha:[124,58],hip:[90,61],kn2:[91,83],ft2:[92,104]},
+      a:{kn:[88,83],ft:[86,104]},
+      b:{kn:[87,83],ft:[66,92]}},
+    calf:{focus:["shin"],props:'<path class="fg-p" d="M132 8v96"/>',
+      s:{toe:[101,104]},
+      a:{head:[90,14],sh:[90,26],el:[107,38],ha:[130,46],hip:[90,61],kn:[90,82],ft:[90,101]},
+      b:{head:[90,6],sh:[90,18],el:[107,30],ha:[130,38],hip:[90,53],kn:[90,74],ft:[93,93]}},
+    box:{focus:["arm"],props:'<path class="fg-p" d="M56 81h40M60 81v23M92 81v23M56 81V42"/>',
+      s:{head:[76,27],sh:[76,40],hip:[76,78],kn:[100,78],ft:[102,104],el2:[86,53],ha2:[91,37]},
+      a:{el:[86,52],ha:[92,38]},
+      b:{el:[100,40],ha:[124,38]}},
+    walk:{focus:["leg"],props:"",
+      s:{head:[90,13],sh:[90,26],hip:[90,61]},
+      a:{el:[84,44],ha:[80,60],el2:[97,43],ha2:[103,57],kn:[95,82],ft:[106,104],kn2:[86,83],ft2:[72,103]},
+      b:{el:[97,43],ha:[103,57],el2:[84,44],ha2:[80,60],kn:[86,83],ft:[72,103],kn2:[95,82],ft2:[106,104]}},
+    swim:{focus:["arm"],props:'<path class="fg-p" style="stroke:#0a84ff;opacity:.5" d="M6 50c12-5 24-5 36 0s24 5 36 0 24-5 36 0 24 5 36 0 24-5 36 0"/>',
+      s:{head:[134,57],sh:[121,60],hip:[80,62],kn:[56,61],ft:[32,59],kn2:[56,65],ft2:[32,70]},
+      a:{el:[139,58],ha:[157,58],el2:[107,46],ha2:[97,38]},
+      b:{el:[110,74],ha:[93,72],el2:[139,58],ha2:[157,58]}},
+    dead:{focus:["torso"],props:"",
+      s:{head:[30,95],sh:[42,99],hip:[82,100],el2:[44,80],ha2:[46,62],kn2:[86,76],ft2:[106,78]},
+      a:{el:[44,80],ha:[46,62],kn:[86,76],ft:[106,78]},
+      b:{el:[27,88],ha:[13,81],kn:[108,92],ft:[134,96]}}
+  };
+
+  const SEGS = [
+    ["sh","el",["arm"]],["el","ha",["arm"]],["sh","hip",["torso"]],
+    ["hip","kn",["leg","thigh"]],["kn","ft",["leg","shin"]],["ft","toe",["leg","shin"]]
+  ];
+
+  function figure(id, t){
+    const P = POSES[id]
+    const pt = k => {
+      const a = (P.a[k] || P.s[k]), b = (P.b[k] || P.s[k])
+      if(!a) return null
+      return [a[0] + (b[0]-a[0])*t, a[1] + (b[1]-a[1])*t]
+    }
+    const line = (p, q, c) => p && q ? `<line class="${c}" x1="${p[0].toFixed(1)}" y1="${p[1].toFixed(1)}" x2="${q[0].toFixed(1)}" y2="${q[1].toFixed(1)}"/>` : ""
+    let out = `<line class="fg-floor" x1="8" y1="107.5" x2="192" y2="107.5"/>` + P.props
+    // extremidades de fondo
+    out += line(pt("sh"), pt("el2"), "fg-b") + line(pt("el2"), pt("ha2"), "fg-b")
+    out += line(pt("hip"), pt("kn2"), "fg-b") + line(pt("kn2"), pt("ft2"), "fg-b")
+    SEGS.forEach(([a, b, g]) => {
+      const on = g.some(x => P.focus.includes(x))
+      out += line(pt(a), pt(b), on ? "fg-o" : "fg-l")
+    })
+    const h = pt("head")
+    if(h) out += `<circle cx="${h[0].toFixed(1)}" cy="${h[1].toFixed(1)}" r="8.5" fill="#f2f2f7"/>`
+    if(P.weight){ const w = pt("ha"); out += `<rect x="${(w[0]-6).toFixed(1)}" y="${(w[1]-6).toFixed(1)}" width="12" height="12" rx="3.5" fill="#8e8e93"/>` }
+    return out
+  }
+  const figSvg = (id, t, vb = "0 0 200 112") => `<svg viewBox="${vb}" aria-hidden="true">${figure(id, t)}</svg>`
+
+  const thumb = id => photoOf(id)
+    ? `<img src="${photoOf(id)[1]}" alt="" loading="lazy" decoding="async"/><span class="badge-play">${ico("play")}</span>`
+    : `${figSvg(id, 1, "4 0 192 112")}<span class="badge-play">${ico("play")}</span>`
+
+  /* ---------- estado ---------- */
+  let phase = Number(store.get("r8phase", 1)) || 1
+  if(!phases[phase]) phase = 1
+  let day = store.get("r8day", "A")
+  if(!plans[day]) day = "A"
+  const todayKey = new Date().toISOString().slice(0,10)
+  let kneeAnswer = store.get("r8knee-date") === todayKey ? store.get("r8knee") : null // "0" | "1" | null
+  const kneeSwollen = () => kneeAnswer === "1"
+
+  const doneKey = (p, d, id) => `r8done-${p}-${d}-${id}`
+  const isDone = (p, d, id) => store.get(doneKey(p, d, id)) === "1"
+
+  /* ---------- navegación ---------- */
+  const pages = ["home","workout","nutrition","supplements","progress"]
+  function showPage(name, smooth = true){
+    if(!pages.includes(name)) name = "home"
+    qsa(".page").forEach(p => p.classList.toggle("active", p.id === "page-" + name))
+    qsa(".tab").forEach(t => t.classList.toggle("active", t.dataset.page === name))
+    qs("#tabs").style.setProperty("--i", pages.indexOf(name))
+    try{ history.replaceState(null, "", "#" + name) }catch(e){}
+    window.scrollTo({top:0, behavior: smooth ? "smooth" : "auto"})
+  }
+  qsa(".tab").forEach(b => b.addEventListener("click", () => { haptic(6); showPage(b.dataset.page) }))
+  qsa("[data-jump]").forEach(b => b.addEventListener("click", () => showPage(b.dataset.jump)))
+
+  /* ---------- toast ---------- */
+  let toastT
+  function toast(msg, warn = false){
+    const t = qs("#toast")
+    qs("#toastT").textContent = msg
+    t.classList.toggle("warn", warn)
+    t.querySelector("use").setAttribute("href", warn ? "#i-warn" : "#i-checkc")
+    t.classList.add("show")
+    clearTimeout(toastT)
+    toastT = setTimeout(() => t.classList.remove("show"), 2200)
+  }
+
+  /* ---------- fecha ---------- */
+  const dt = new Date().toLocaleDateString("es-MX", {weekday:"long", day:"numeric", month:"long"})
+  qs("#todayDate").textContent = dt
+
+  /* ---------- rodilla ---------- */
+  function setKnee(v){
+    kneeAnswer = v ? "1" : "0"
+    store.set("r8knee", kneeAnswer)
+    store.set("r8knee-date", todayKey)
+    haptic(12)
+    renderAll()
+  }
+  qs("#kneeNo").addEventListener("click", () => setKnee(false))
+  qs("#kneeYes").addEventListener("click", () => setKnee(true))
+
+  function renderKnee(){
+    qs("#kneeNo").classList.toggle("on", kneeAnswer === "0")
+    qs("#kneeYes").classList.toggle("on", kneeAnswer === "1")
+    const host = qs("#kneeState")
+    if(kneeAnswer === null){ host.innerHTML = ""; return }
+    host.innerHTML = kneeSwollen()
+      ? `<div class="state bad">${ico("drops")}<div>Hoy omite pierna y rodilla. Haz solo tren superior y core sin dolor, y no subas cargas.</div></div>`
+      : `<div class="state good">${ico("checkc")}<div>Puedes hacer la sesión completa mientras no aparezca dolor articular ni hinchazón nueva.</div></div>`
+    qs("#kneeBanner").innerHTML = kneeSwollen()
+      ? `<div class="banner">${ico("warn")}<div><b>Rodilla hinchada hoy</b>Los ejercicios de pierna quedan en pausa. Sigue con tren superior y core.</div></div>`
+      : ""
+  }
+
+  /* ---------- segmentados ---------- */
+  function syncSeg(el, idx){ el.querySelector(".thumb").style.setProperty("--i", idx) }
+  qsa("#weekSeg button").forEach((b, i) => b.addEventListener("click", () => {
+    phase = Number(b.dataset.phase); store.set("r8phase", String(phase)); haptic(6); resetTimer(); renderAll()
+  }))
+  qsa("#daySeg button").forEach(b => b.addEventListener("click", () => {
+    day = b.dataset.day; store.set("r8day", day); haptic(6); renderAll()
+  }))
+
+  /* ---------- sesión ---------- */
+  function dayStats(p, d){
+    const ids = plans[d]
+    const avail = ids.filter(id => !(kneeSwollen() && exercises[id].knee))
+    const done = avail.filter(id => isDone(p, d, id)).length
+    return {total: avail.length, done, pct: avail.length ? Math.round(done / avail.length * 100) : 0}
+  }
+  function phaseStats(p){
+    let total = 0, done = 0
+    Object.keys(plans).forEach(d => plans[d].forEach(id => { total++; if(isDone(p, d, id)) done++ }))
+    return {total, done, pct: total ? Math.round(done / total * 100) : 0}
+  }
+  const estMin = (p, d) => {
+    const P = phases[p], n = dayStats(p, d).total
+    return Math.round(n * P.sets * 1.7 + P.rounds * 75 / 60 + 4)
+  }
+
+  function renderWorkout(){
+    const P = phases[phase]
+    const wi = qsa("#weekSeg button").findIndex(b => Number(b.dataset.phase) === phase)
+    const di = qsa("#daySeg button").findIndex(b => b.dataset.day === day)
+    syncSeg(qs("#weekSeg"), wi); syncSeg(qs("#daySeg"), di)
+    qs("#phaseChips").innerHTML = `<span class="chip orange">${P.goal}</span><span class="chip">${P.sets} series</span><span class="chip">${P.reps} reps</span><span class="chip">${P.rpe}</span>`
+    qs("#dayTitle").textContent = "Día " + day
+    const st = dayStats(phase, day)
+    qs("#dayCount").textContent = `${st.done}/${st.total}`
+    qs("#finisherText").textContent = P.finisher
+    qs("#woK").textContent = P.label
+    qs("#woH").textContent = `${P.goal} · Día ${day}`
+    const firstPhoto = plans[day].find(id => photoOf(id))
+    if(firstPhoto){ qs("#woImg").src = photoOf(firstPhoto)[1]; qs("#todayImg").src = photoOf(firstPhoto)[1] }
+    qs("#cardioList").innerHTML = ["box","walk","swim"].map(id => `
+      <button class="row" data-cardio="${id}" style="min-height:68px">
+        <span class="thumbfig" style="width:56px;height:46px;border-radius:12px">${thumb(id)}</span>
+        <span class="tx"><span class="t" style="display:block;font-size:16px">${cardio[id].name}</span><span class="s" style="display:block">${id === "box" ? "Opción principal" : id === "walk" ? "Si la rodilla está tranquila" : "Semanas 7–8 en adelante"}</span></span>
+        <span class="r"><svg class="i sm"><use href="#i-chev"/></svg></span>
+      </button>`).join("")
+    qsa("#cardioList [data-cardio]").forEach(b => b.addEventListener("click", () => openSheet(b.dataset.cardio)))
+
+    const host = qs("#exerciseList")
+    host.innerHTML = ""
+    plans[day].forEach(id => {
+      const e = exercises[id]
+      const off = kneeSwollen() && e.knee
+      const done = isDone(phase, day, id)
+      const reps = e.special || `${P.sets} × ${P.reps}`
+      const row = document.createElement("div")
+      row.className = "ex" + (off ? " off" : "") + (done && !off ? " done" : "")
+      row.innerHTML = `
+        <button class="open" aria-label="Ver ${e.name}">
+          <span class="thumbfig">${thumb(id)}</span>
+          <span style="min-width:0"><span class="t" style="display:block">${e.name}</span>
+          <span class="s" style="display:block">${off ? "En pausa hoy por la rodilla" : `${e.group} · <span style="white-space:nowrap">${reps}</span>`}</span></span>
+        </button>
+        <button class="check ${done && !off ? "on" : ""}" aria-label="${done ? "Desmarcar" : "Marcar"} ${e.name}" ${off ? "disabled" : ""}><span>${ico("check")}</span></button>`
+      row.querySelector(".open").addEventListener("click", () => openSheet(id))
+      row.querySelector(".check").addEventListener("click", () => toggleDone(id))
+      host.appendChild(row)
+    })
+  }
+
+  function toggleDone(id){
+    const now = !isDone(phase, day, id)
+    store.set(doneKey(phase, day, id), now ? "1" : "0")
+    haptic(now ? [8, 40, 14] : 6)
+    renderAll()
+    const st = dayStats(phase, day)
+    if(now && st.done === st.total && st.total) toast(`Día ${day} completo`)
+  }
+
+  /* ---------- resumen ---------- */
+  function setRing(el, pct){ el.style.strokeDashoffset = String(100 - Math.max(0, Math.min(100, pct))) }
+
+  function renderHome(){
+    const P = phases[phase]
+    const ps = phaseStats(phase), ds = dayStats(phase, day)
+    const weekEnd = phase + 1
+    setRing(qs("#ringA"), ps.pct); setRing(qs("#ringB"), ds.pct); setRing(qs("#ringC"), weekEnd / 8 * 100)
+    qs("#lgA").innerHTML = `${ps.pct}<small>%</small>`
+    qs("#lgB").innerHTML = `${ds.done}<small>/${ds.total}</small>`
+    qs("#lgC").innerHTML = `sem ${phase}–${weekEnd}<small>/8</small>`
+
+    qs("#todayKicker").textContent = `${P.label} · ${P.goal}`
+    qs("#todayTitle").textContent = "Día " + day
+    qs("#todayCount").textContent = ds.total
+    qs("#todayMin").textContent = `~${estMin(phase, day)} min`
+    qs("#todayRpe").textContent = P.rpe
+    qs("#todayBar").style.width = ds.pct + "%"
+    qs("#todayDone").textContent = `${ds.done} de ${ds.total} completados`
+    qs("#todayPct").textContent = ds.pct + "%"
+
+    const cta = qs("#todayCta")
+    const next = ["A","B","C"][(["A","B","C"].indexOf(day) + 1) % 3]
+    if(ds.total && ds.done === ds.total){
+      cta.className = "btn tinted"
+      cta.innerHTML = `${ico("checkc")}<span>Listo, siguiente: día ${next}</span>`
+      cta.onclick = () => { day = next; store.set("r8day", day); renderAll(); showPage("workout") }
+    }else{
+      cta.className = "btn primary"
+      cta.innerHTML = `${ico("play")}<span>${ds.done ? "Continuar entrenamiento" : "Empezar entrenamiento"}</span>`
+      cta.onclick = () => {
+        if(kneeAnswer === null){
+          qs("#kneeSection").scrollIntoView({behavior:"smooth", block:"center"})
+          toast("Primero haz el chequeo de rodilla", true)
+          return
+        }
+        showPage("workout")
+      }
+    }
+  }
+
+  /* ---------- sheet + visor cuadro por cuadro ---------- */
+  let sheetId = null, raf = null, vTimer = null
+  const V = {mode:"photo", playing:true, frame:0}
+  const ANIM_FRAMES = [{t:0,l:"Inicio"},{t:.5,l:"Medio"},{t:1,l:"Final"}]
+  const PHOTO_FRAMES = [{l:"1 · Inicio"},{l:"2 · Final"}]
+
+  function stopViewer(){ cancelAnimationFrame(raf); clearInterval(vTimer); raf = null; vTimer = null }
+  function renderViewer(){
+    stopViewer()
+    const photos = photoOf(sheetId)
+    if(!photos) V.mode = "anim"
+    qs("#vMode").style.display = photos ? "" : "none"
+    syncSeg(qs("#vMode"), V.mode === "photo" ? 0 : 1)
+    const stage = qs("#vStage")
+    const frames = V.mode === "photo" ? PHOTO_FRAMES : ANIM_FRAMES
+    qs("#vFrames").innerHTML = frames.map((f, i) => `<button data-f="${i}" class="${!V.playing && V.frame === i ? "on" : ""}">${f.l}</button>`).join("")
+    qsa("#vFrames button").forEach(b => b.addEventListener("click", () => { V.playing = false; V.frame = Number(b.dataset.f); haptic(6); renderViewer() }))
+    qs("#vPlay").innerHTML = V.playing ? ico("pause") : ico("play")
+    qs("#vPlay").setAttribute("aria-label", V.playing ? "Pausar" : "Reproducir")
+
+    if(V.mode === "photo"){
+      const note = photoNote[sheetId] ? `<div class="note">${photoNote[sheetId]}</div>` : ""
+      stage.innerHTML = photos.map((p, i) => `<img src="${p}" alt="${allEx(sheetId).name}, ${i ? "posición final" : "posición inicial"}" class="${i === V.frame ? "on" : ""}"/>`).join("") + `<div class="cap" id="vCap">${PHOTO_FRAMES[V.frame].l}</div>` + note
+      if(V.playing){
+        let i = V.frame
+        vTimer = setInterval(() => {
+          i = (i + 1) % 2
+          qsa("#vStage img").forEach((im, k) => im.classList.toggle("on", k === i))
+          qs("#vCap").textContent = PHOTO_FRAMES[i].l
+          qsa("#vFrames button").forEach((b, k) => b.classList.toggle("on", k === i))
+          V.frame = i
+        }, 1500)
+        qsa("#vFrames button").forEach((b, k) => b.classList.toggle("on", k === V.frame))
+      }
+    }else{
+      if(!V.playing){
+        const fr = ANIM_FRAMES[Math.min(V.frame, 2)]
+        stage.innerHTML = figSvg(sheetId, fr.t, "0 -4 200 120") + `<div class="cap">${fr.l}</div>`
+      }else{
+        stage.innerHTML = `<div id="vFig"></div><div class="cap" id="vCap">Inicio</div>`
+        const t0 = performance.now(), period = 2600
+        const tick = now => {
+          const ph = ((now - t0) % period) / period
+          let t
+          if(ph < .15) t = 0
+          else if(ph < .5) t = (1 - Math.cos((ph - .15) / .35 * Math.PI)) / 2
+          else if(ph < .65) t = 1
+          else t = (1 + Math.cos((ph - .65) / .35 * Math.PI)) / 2
+          const fig = qs("#vFig")
+          if(!fig) return
+          fig.innerHTML = figSvg(sheetId, t, "0 -4 200 120")
+          const idx = t < .25 ? 0 : t > .75 ? 2 : 1
+          const cap = qs("#vCap"); if(cap) cap.textContent = ANIM_FRAMES[idx].l
+          qsa("#vFrames button").forEach((b, k) => b.classList.toggle("on", k === idx))
+          raf = requestAnimationFrame(tick)
+        }
+        raf = requestAnimationFrame(tick)
+      }
+    }
+  }
+  qsa("#vMode button").forEach(b => b.addEventListener("click", () => { V.mode = b.dataset.m; V.frame = 0; V.playing = true; haptic(6); renderViewer() }))
+  qs("#vPlay").addEventListener("click", () => { V.playing = !V.playing; if(V.mode === "anim" && !V.playing) V.frame = 2; haptic(6); renderViewer() })
+
+  function renderSheetCta(){
+    const b = qs("#sDone")
+    if(cardio[sheetId]){
+      b.disabled = false
+      b.className = "btn primary"
+      b.innerHTML = `${ico("clock")}<span>Ir al timer</span>`
+      return
+    }
+    const e = exercises[sheetId], off = kneeSwollen() && e.knee, done = isDone(phase, day, sheetId)
+    const inPlan = plans[day].includes(sheetId)
+    b.disabled = off || !inPlan
+    b.className = done ? "btn gray" : "btn green"
+    b.innerHTML = off ? `${ico("drops")}<span>En pausa hoy por la rodilla</span>`
+      : done ? `${ico("reset")}<span>Desmarcar</span>`
+      : `${ico("check")}<span>Marcar como hecho</span>`
+  }
+  function openSheet(id){
+    sheetId = id
+    const e = allEx(id), P = phases[phase]
+    qs("#sTitle").textContent = e.name
+    qs("#sSub").textContent = e.group
+    qs("#sChips").innerHTML = cardio[id]
+      ? `<span class="chip orange">45 s rápido</span><span class="chip green">30 s suave</span><span class="chip">${P.rounds} rondas</span>`
+      : e.special
+      ? `<span class="chip orange">${e.special}</span>`
+      : `<span class="chip orange">${P.sets} series</span><span class="chip">${P.reps} reps</span><span class="chip">${P.rpe}</span>`
+    qs("#sSteps").innerHTML = e.steps.map((s, i) => `<li><i>${i+1}</i><span>${s}</span></li>`).join("")
+    qs("#sCaution").textContent = e.caution + (e.knee ? " Si la rodilla se hincha después o al día siguiente, no progreses este ejercicio." : "")
+    V.mode = photoOf(id) ? "photo" : "anim"; V.playing = true; V.frame = 0
+    renderSheetCta()
+    qs("#sheet").scrollTop = 0
+    qs("#sheet").style.transform = ""
+    qs("#scrim").classList.add("show")
+    qs("#sheet").classList.add("show")
+    document.body.style.overflow = "hidden"
+    renderViewer()
+  }
+  function closeSheet(){
+    qs("#scrim").classList.remove("show")
+    qs("#sheet").classList.remove("show")
+    qs("#sheet").style.transform = ""
+    document.body.style.overflow = ""
+    stopViewer()
+  }
+  qs("#sClose").addEventListener("click", closeSheet)
+  qs("#scrim").addEventListener("click", closeSheet)
+  document.addEventListener("keydown", e => { if(e.key === "Escape") closeSheet() })
+  qs("#sDone").addEventListener("click", () => {
+    if(cardio[sheetId]){ closeSheet(); setTimeout(() => qs("#tStart").scrollIntoView({behavior:"smooth", block:"center"}), 300); return }
+    const wasDone = isDone(phase, day, sheetId)
+    toggleDone(sheetId)
+    renderSheetCta()
+    if(!wasDone) setTimeout(closeSheet, 280)
+  })
+  // arrastrar para cerrar
+  ;(() => {
+    const g = qs("#grab"), s = qs("#sheet")
+    let y0 = null, dy = 0
+    g.addEventListener("touchstart", e => { y0 = e.touches[0].clientY; s.style.transition = "none" }, {passive:true})
+    g.addEventListener("touchmove", e => {
+      if(y0 === null) return
+      dy = Math.max(0, e.touches[0].clientY - y0)
+      s.style.transform = `translate(-50%, ${dy}px)`
+    }, {passive:true})
+    g.addEventListener("touchend", () => {
+      s.style.transition = ""
+      if(dy > 110) closeSheet()
+      else s.style.transform = ""
+      y0 = null; dy = 0
+    })
+  })()
+
+  /* ---------- timer por intervalos ---------- */
+  const WORK = 45, REST = 30
+  let tState = {running:false, mode:"work", left:WORK, round:1}
+  let tId = null, wake = null
+  const fmt = s => `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`
+  function renderTimer(){
+    const total = tState.mode === "work" ? WORK : REST
+    const R = phases[phase].rounds
+    qs("#tTime").textContent = fmt(tState.left)
+    const ring = qs("#tRing")
+    ring.style.stroke = tState.mode === "work" ? "var(--orange)" : "var(--green)"
+    ring.style.strokeDashoffset = String(100 - tState.left / total * 100)
+    const ph = qs("#tPhase")
+    ph.textContent = tState.mode === "done" ? "Completado" : tState.mode === "work" ? "Trabajo" : "Descanso"
+    ph.className = "ph " + (tState.mode === "rest" || tState.mode === "done" ? "c-green" : "c-orange")
+    qs("#tRound").textContent = `Ronda ${Math.min(tState.round, R)} de ${R}`
+    const b = qs("#tStart")
+    b.innerHTML = tState.running ? `${ico("pause")}<span>Pausar</span>` : `${ico("play")}<span>${tState.left < total || tState.round > 1 ? "Continuar" : "Iniciar"}</span>`
+    if(tState.mode === "done"){ b.innerHTML = `${ico("reset")}<span>Repetir</span>` }
+  }
+  async function keepAwake(on){
+    try{
+      if(on && "wakeLock" in navigator){ wake = await navigator.wakeLock.request("screen") }
+      else if(!on && wake){ await wake.release(); wake = null }
+    }catch(e){}
+  }
+  function stopTick(){ clearInterval(tId); tId = null; tState.running = false; keepAwake(false) }
+  function resetTimer(){ stopTick(); tState = {running:false, mode:"work", left:WORK, round:1}; renderTimer() }
+  qs("#tStart").addEventListener("click", () => {
+    haptic(8)
+    if(tState.mode === "done"){ resetTimer() }
+    if(tState.running){ stopTick(); renderTimer(); return }
+    tState.running = true; keepAwake(true)
+    tId = setInterval(() => {
+      tState.left--
+      if(tState.left <= 3 && tState.left > 0) haptic(15)
+      if(tState.left <= 0){
+        const R = phases[phase].rounds
+        if(tState.mode === "work"){
+          if(tState.round >= R){ stopTick(); tState.mode = "done"; tState.left = 0; haptic([120,80,120,80,200]); toast("Cardio completado") }
+          else { tState.mode = "rest"; tState.left = REST; haptic([60,40,60]) }
+        }else{
+          tState.mode = "work"; tState.left = WORK; tState.round++; haptic([120,60,120])
+        }
+      }
+      renderTimer()
+    }, 1000)
+    renderTimer()
+  })
+  qs("#tReset").addEventListener("click", () => { haptic(6); resetTimer() })
+
+  /* ---------- progreso ---------- */
+  function renderProgress(){
+    const ps = phaseStats(phase)
+    setRing(qs("#pRing"), ps.pct)
+    qs("#pPct").textContent = ps.pct + "%"
+    qs("#pTitle").textContent = phases[phase].label
+    qs("#pBars").innerHTML = ["A","B","C"].map(d => {
+      const ids = plans[d], c = ids.filter(id => isDone(phase, d, id)).length
+      const h = Math.max(8, Math.round(c / ids.length * 100))
+      const cls = c === ids.length ? "full" : c ? "part" : ""
+      return `<div class="col"><div class="track"><div class="fill ${cls}" style="height:${h}%"></div></div><div class="k">Día ${d} · ${c}/${ids.length}</div></div>`
+    }).join("")
+  }
+
+  const painIn = qs("#painIn")
+  const painColor = v => v <= 2 ? "var(--green)" : v <= 5 ? "var(--yellow)" : "var(--red)"
+  function syncPain(){ const v = Number(painIn.value); const el = qs("#painV"); el.textContent = `${v}/10`; el.style.color = painColor(v) }
+  painIn.addEventListener("input", () => { syncPain(); haptic(4) })
+  syncPain()
+
+  const getLogs = () => { try{ return JSON.parse(store.get("r8logs", "[]")) || [] }catch(e){ return [] } }
+
+  qs("#saveLog").addEventListener("click", () => {
+    const w = parseFloat(qs("#wIn").value), wa = parseFloat(qs("#waIn").value)
+    if(Number.isNaN(w) && Number.isNaN(wa)){ toast("Agrega tu peso o cintura", true); qs("#wIn").focus(); return }
+    const logs = getLogs()
+    logs.unshift({
+      t: new Date().toISOString(),
+      d: new Date().toLocaleDateString("es-MX"),
+      w: Number.isNaN(w) ? null : w,
+      wa: Number.isNaN(wa) ? null : wa,
+      pain: Number(painIn.value),
+      swelling: qs("#swIn").checked ? 1 : 0
+    })
+    store.set("r8logs", JSON.stringify(logs.slice(0, 60)))
+    qs("#wIn").value = ""; qs("#waIn").value = ""; painIn.value = 0; qs("#swIn").checked = false; syncPain()
+    document.activeElement && document.activeElement.blur()
+    haptic([10, 40, 16])
+    toast("Registro guardado")
+    renderHistory()
+  })
+
+  function shortDate(l){
+    if(l.t){ try{ return new Date(l.t).toLocaleDateString("es-MX", {day:"numeric", month:"short"}) }catch(e){} }
+    return l.d || ""
+  }
+  function renderHistory(){
+    const logs = getLogs()
+    const host = qs("#historyList")
+    if(!logs.length){
+      host.innerHTML = `<div class="empty">${ico("cal")}<div>Sin registros todavía.<br>Tu primer registro aparecerá aquí.</div></div>`
+    }else{
+      host.innerHTML = logs.slice(0, 12).map(l => {
+        const parts = []
+        if(l.w != null) parts.push(`${l.w} kg`)
+        if(l.wa != null) parts.push(`${l.wa} cm`)
+        const pc = l.pain <= 2 ? "green" : l.pain <= 5 ? "orange" : "red"
+        return `<div class="row hrow">
+          <span class="ic ${l.swelling ? "red" : "gray"}">${ico(l.swelling ? "drops" : "cal")}</span>
+          <span class="tx"><span class="t" style="display:block">${shortDate(l)}</span><span class="s" style="display:block">${parts.join(" · ") || "Sin medidas"}${l.swelling ? " · con hinchazón" : ""}</span></span>
+          <span class="chip ${pc}" style="font-variant-numeric:tabular-nums">Dolor ${l.pain}/10</span>
+        </div>`
+      }).join("")
+    }
+    // tendencia
+    const ws = logs.filter(l => l.w != null).map(l => l.w).reverse()
+    const sec = qs("#trendSection")
+    if(ws.length < 2){ sec.hidden = true; return }
+    sec.hidden = false
+    const delta = +(ws[ws.length-1] - ws[0]).toFixed(1)
+    qs("#trendD").innerHTML = `${delta > 0 ? "+" : delta < 0 ? "−" : ""}${Math.abs(delta)}<small>kg</small>`
+    qs("#trendD").style.color = delta <= 0 ? "var(--green)" : "var(--orange)"
+    const min = Math.min(...ws), max = Math.max(...ws), rng = (max - min) || 1
+    const pts = ws.map((v, i) => [i / (ws.length - 1) * 196 + 2, 50 - (v - min) / rng * 44])
+    const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join(" ")
+    const last = pts[pts.length-1]
+    qs("#trendSvg").innerHTML = `<path d="${d}" fill="none" stroke="var(--blue)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>`
+      + `<circle cx="${last[0]}" cy="${last[1]}" r="3.5" fill="var(--blue)"/>`
+  }
+
+  /* ---------- render ---------- */
+  function renderAll(){
+    renderKnee()
+    renderWorkout()
+    renderHome()
+    renderProgress()
+  }
+
+  renderAll()
+  renderTimer()
+  renderHistory()
+  showPage(location.hash.replace("#", "") || "home", false)
+
+  if("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")){
+    window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(() => {}) })
+  }
+})()
+</script>
+</body>
+</html>
